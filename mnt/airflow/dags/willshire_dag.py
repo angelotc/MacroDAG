@@ -13,49 +13,6 @@ import csv
 import requests
 import os
 
-## DEFINE CONNECTIONS
-# conn = Connection(
-#         conn_id = "willshire_api",
-#         conn_type = "http",
-#         host="https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1168&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WILL5000IND&scale=left&cosd=2019-06-02&coed=2020-09-04&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily%2C%20Close&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-08&revision_date=2020-09-08&nd=1999-12-31"
-# )
-# session = settings.Session()
-# session.add(conn)
-# session.commit()
-
-# conn2 = Connection(
-#         conn_id = "willshire_path",
-#         conn_type = "fs",
-#         extra = {"path" : "/usr/local/airflow/dags/files"}
-#         )
-
-# session.add(conn2)
-# session.commit()
-# create_conn("willshire_path","fs",extra=json.dumps)
-# def create_conn(conn_id, conn_type, host, login, password, port,extra):
-#     conn = Connection(
-#         conn_id=conn_id,
-#         conn_type=conn_type,
-#         host=host,
-#         login=login,
-#         password=password,
-#         port=port
-#         extra=extra
-#     )
-#     session = settings.Session()
-#     conn_name = session\
-#     .query(Connection)\
-#     .filter(Connection.conn_id == conn.conn_id)\
-#     .first()
-
-#     if str(conn_name) == str(conn_id):
-#         return logging.info(f"Connection {conn_id} already exists")
-
-#     session.add(conn)
-#     session.commit()
-#     logging.info(Connection.log_info(conn))
-#     logging.info(f'Connection {conn_id} is created')
-
 
 ## DAG STUFF 
 default_args = {
@@ -84,7 +41,10 @@ def download_rates():
     #             outfile.write('\n')
     # SAVE URL -> CSV
     temp_file_name = 'willshire.csv'
-    CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?mode=fred&recession_bars=on&ts=12&tts=12&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WILL5000PRFC&scale=left&cosd=2019-06-02&coed=2020-09-04&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily%2C%20Close&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-08&revision_date=2020-09-08&nd=1999-12-31%22'
+    # 20 years ago
+    start_date = (datetime.datetime.now().date())
+    current_date = ((datetime.datetime.now() - datetime.timedelta(days=20*365)).date())
+    CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?mode=fred&recession_bars=on&ts=12&tts=12&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WILL5000PRFC&scale=left&cosd={}&coed={}&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily%2C%20Close&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-08&revision_date=2020-09-08&nd=1999-12-31%22'.format(str(start_date),str(end_date))
     data = {}
     response = requests.get(CSV_URL)
     with open(os.path.join("/usr/local/airflow/dags/files/", temp_file_name), 'wb') as f:
@@ -168,7 +128,7 @@ with DAG(dag_id = "buffett_indicator",
     populate_willshire_incremental = SparkSubmitOperator(
         task_id = "populate_willshire_incremental",
         conn_id = "spark_conn",
-        application = "/usr/local/airflow/dags/scripts/willshire_processing.py",
+        application = "/usr/local/airflow/dags/scripts/willshire_incremental_populate.py",
         verbose = False
     )
     # sending_email = EmailOperator(
