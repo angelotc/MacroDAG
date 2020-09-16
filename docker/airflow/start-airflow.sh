@@ -15,3 +15,6 @@ airflow scheduler &> /dev/null &
 
 # Run the web sever in foreground (for docker logs)
 exec airflow webserver
+
+# Initialize connections (doesn't work??)
+#python3 /usr/local/airflow/dags/airflow_local_connections/airflow_connections.py
