@@ -27,23 +27,11 @@ default_args = {
 }
 
 def download_rates():
-    # with open('/usr/local/airflow/dags/files/willshire.csv') as forex_currencies:
-    #     reader = csv.DictReader(forex_currencies, delimiter=';')
-    #     for row in reader:
-    #         base = row['base']
-    #         with_pairs = row['with_pairs'].split(' ')
-    #         indata = requests.get('https://api.exchangeratesapi.io/latest?base=' + base).json()
-    #         outdata = {'base': base, 'rates': {}, 'last_update': indata['date']}
-    #         for pair in with_pairs:
-    #             outdata['rates'][pair] = indata['rates'][pair]
-    #         with open('/usr/local/airflow/dags/files/forex_rates.json', 'a') as outfile:
-    #             json.dump(outdata, outfile)
-    #             outfile.write('\n')
     # SAVE URL -> CSV
     temp_file_name = 'willshire.csv'
     # 20 years ago
     start_date = (datetime.datetime.now().date())
-    current_date = ((datetime.datetime.now() - datetime.timedelta(days=20*365)).date())
+    end_date = ((datetime.datetime.now() - datetime.timedelta(days=20*365)).date())
     CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?mode=fred&recession_bars=on&ts=12&tts=12&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WILL5000PRFC&scale=left&cosd={}&coed={}&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily%2C%20Close&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-08&revision_date=2020-09-08&nd=1999-12-31%22'.format(str(start_date),str(end_date))
     data = {}
     response = requests.get(CSV_URL)
