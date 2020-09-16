@@ -5,7 +5,7 @@
 4. You can access the Airflow UI by going to http://localhost:8080 . Turn the DAG on, and trigger it. 
 5. Run stop.sh to stop the containers. 
 
-# Illustration of DAG. Its purpose is to pull Willshire 5000 rates on a nightly basis. 
+# Illustration of DAG. Its purpose is to pull Willshire 5000 rates (which is an indicator of Stock Market Capitalization). 
 
 ![Test Image 6](https://github.com/angelotc/airflow-docker-hdfs-spark-example/blob/master/dag-example.png)
 
