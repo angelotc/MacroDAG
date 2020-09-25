@@ -1,9 +1,15 @@
 # Instructions
-1. Run start.sh to execute the docker-compose.
+1. Run start.sh to execute the docker-compose (you can do this in command prompt by typing ```./start.sh```). 
 2. *Optional:* In ```/airflow-docker-hdfs-spark-example/mnt/airflow/airflow.cfg``` , fill in ```smtp_host```, ```smtp_user```, ```smtp_password```, ```smtp_mail_from``` under the ```smtp``` tag. 
-3. Type ```docker ps``` in command line to view running containers.
+3. Type ```docker ps``` in command line to view running containers. Copy the Container ID for Airflow
 4. You can access the Airflow UI by going to http://localhost:8080 . Turn the DAG on, and trigger it. 
-5. Run stop.sh to stop the containers. 
+# Starting your connections
+5. In command prompt, type ```docker exec -it <your Airflow Container ID> /bin/bash```.
+6. You are now in your Airflow container. Type ```cd usr/local/airflow/dags/airflow_local_connections``` in command prompt, and start your connections by typing in ```python3 airflow_connections.py```
+# Stopping your containers
+7. Exit your Airflow container by pressing Ctrl + D. 
+8. Run stop.sh ( type ```./stop.sh``` ). 
+
 
 # Illustration of DAG
 The purpose of this ETL pipeline is to pull Willshire 5000 rates on a nightly basis. The Willshire 5000 Index is an indicator of Stock Market Capitalization (SMC). 
