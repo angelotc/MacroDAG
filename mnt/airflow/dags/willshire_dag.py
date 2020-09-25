@@ -30,8 +30,8 @@ def download_rates():
     # SAVE URL -> CSV
     temp_file_name = 'willshire.csv'
     # 20 years ago
-    start_date = (datetime.datetime.now().date())
-    end_date = ((datetime.datetime.now() - datetime.timedelta(days=20*365)).date())
+    start_date = (datetime.now().date())
+    end_date = ((datetime.now() - timedelta(days=20*365)).date())
     CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?mode=fred&recession_bars=on&ts=12&tts=12&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WILL5000PRFC&scale=left&cosd={}&coed={}&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily%2C%20Close&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-08&revision_date=2020-09-08&nd=1999-12-31%22'.format(str(start_date),str(end_date))
     data = {}
     response = requests.get(CSV_URL)
@@ -50,7 +50,7 @@ def download_rates():
     
 
 
-with DAG(dag_id = "buffett_indicator", 
+with DAG(dag_id = "willshire_dag", 
         schedule_interval = "@daily",
         default_args = default_args, 
         catchup = False) as dag:
@@ -119,6 +119,19 @@ with DAG(dag_id = "buffett_indicator",
         application = "/usr/local/airflow/dags/scripts/willshire_incremental_populate.py",
         verbose = False
     )
+    
+    populate_willshire_base = SparkSubmitOperator(
+        task_id = "populate_willshire_base",
+        conn_id = "spark_conn",
+        application = "/usr/local/airflow/dags/scripts/willshire_base_populate.py",
+        verbose = False
+    )
+    delete_willshire_incremental_rows = SparkSubmitOperator(
+        task_id = "delete_willshire_incremental_rows",
+        conn_id = "spark_conn",
+        application = "/usr/local/airflow/dags/scripts/willshire_delete_incremental.py",
+        verbose = False
+    )
     # sending_email = EmailOperator(
     #     task_id="sending_email",
     #     to="angelocortez102@gmail.com",
@@ -127,5 +140,4 @@ with DAG(dag_id = "buffett_indicator",
     #         <h3>forex_data_pipeline succeeded</h3>
     #     """
     #     )
-
-    #is_forex_rates_available >> is_forex_currencies_file_available >> downloading_rates >> saving_rates >> creating_forex_rates_table >> forex_processing >> sending_email
+    is_willshire_5000_available >> downloading_rates >> is_willshire_file_available >> saving_rates >> [creating_willshire_base_table, creating_willshire_incremental_table] >> populate_willshire_incremental >> populate_willshire_base >> delete_willshire_incremental_rows

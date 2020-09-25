@@ -16,18 +16,22 @@ spark = SparkSession \
 # Read the file willshire.csv from the HDFS
 incr_df = spark.read.csv('hdfs://namenode:9000/willshire/willshire.csv', header = True)
 base_df = spark.sql("SELECT * FROM willshire_base_table")
-incr_df = df.union(df2)
+incr_df = incr_df.subtract(base_df)
+#incr_df = incr_df.union(base_df)
+#incr_df.show()
 
-# Drop the duplicated rows based on the base and last_update columns
-forex_rates = df3.select('DATE', 'WILL5000PRFC') \
-    .dropDuplicates(['DATE', 'WILL5000PRFC']) \
-    .fillna(0)
+# Rename columns after union
+incr_df = incr_df.selectExpr("DATE as date", "WILL5000PRFC as will5000")
 
-forex_rates.show()
+# # Drop the duplicated rows based on the base and last_update columns
+willshire_rates = incr_df.select('date', 'will5000') \
+    .dropDuplicates(['date', 'will5000']) \
+    .fillna(0,['will5000']) \
+    .orderBy("date")
+
+#willshire_rates.show()
 
 
+# Export the dataframe into the Hive table willshire_rates
 
-# # Export the dataframe into the Hive table willshire_rates
-
-#df2 = spark.sql("DELETE FROM willshire_rates")
-#forex_rates.write.mode("append").insertInto("willshire_rates")
+willshire_rates.write.mode("append").insertInto("willshire_incremental_table")
