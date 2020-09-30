@@ -126,6 +126,13 @@ with DAG(dag_id = "willshire_dag",
         application = "/usr/local/airflow/dags/scripts/willshire_base_populate.py",
         verbose = False
     )
+
+    impute_willshire_zeros = SparkSubmitOperator(
+        task_id = "impute_willshire_zeros",
+        conn_id = "spark_conn",
+        application = "/usr/local/airflow/dags/scripts/impute_willshire_zeros.py",
+        verbose = False
+    )
     delete_willshire_incremental_rows = SparkSubmitOperator(
         task_id = "delete_willshire_incremental_rows",
         conn_id = "spark_conn",

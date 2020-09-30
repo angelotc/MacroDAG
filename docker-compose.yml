@@ -22,6 +22,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
   adminer:
     image: wodby/adminer:latest
@@ -38,6 +41,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
 ######################################################
 # HADOOP SERVICES
@@ -57,6 +63,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
   datanode:
     build: ./docker/hadoop/hadoop-datanode
@@ -73,6 +82,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
   # The services below are only useful if you want
   # to use YARN with HADOOP. Since we are going to use
@@ -144,6 +156,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
   hive-server:
     build: ./docker/hive/hive-server
@@ -161,7 +176,10 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
-
+    logging:
+      options:
+        max-size: 1g
+      
   hive-webhcat:
     build: ./docker/hive/hive-webhcat
     restart: always
@@ -175,6 +193,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
   hue:
     build: ./docker/hue
@@ -194,6 +215,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
 ######################################################
 # SPARK SERVICES
@@ -213,7 +237,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
-
+    logging:
+      options:
+        max-size: 1g
   spark-worker:
     build: ./docker/spark/spark-worker
     depends_on:
@@ -228,6 +254,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
   livy:
     build: ./docker/livy
@@ -246,6 +275,11 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
+
+
 
 ######################################################
 # AIRFLOW
@@ -265,6 +299,9 @@ services:
       timeout: 45s
       interval: 10s
       retries: 10
+    logging:
+      options:
+        max-size: 1g
 
 ######################################################
 # NETWORK
@@ -275,3 +312,4 @@ services:
 networks:
   default:
     name: airflow-network
+

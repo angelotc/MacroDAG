@@ -53,12 +53,10 @@ RUN chown -R airflow: ${AIRFLOW_HOME}
 # Copy the entrypoint.sh from host to container (at path AIRFLOW_HOME)
 COPY ./start-airflow.sh ./start-airflow.sh
 
-COPY ./start-connections.sh ./start-connections.sh
 
 # Set the entrypoint.sh file to be executable
 RUN chmod +x ./start-airflow.sh
 
-RUN chmod +x ./start-connections.sh
 
 # Set the username to use
 USER airflow
