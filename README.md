@@ -16,3 +16,8 @@ The purpose of this ETL pipeline is to pull Willshire 5000 rates on a nightly ba
 
 ![Test Image 6](https://github.com/angelotc/airflow-docker-hdfs-spark-example/blob/master/dag-example.png)
 
+# To-do list (in order of priority)
+1. Create DAG for interest rates
+2. Add Pandas UDF of interpolate to fill 0 values
+3. Create DAG for GDP
+4. GDP estimation using fbprophet
