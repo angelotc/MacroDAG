@@ -30,8 +30,8 @@ def download_willshire_rates():
     # SAVE URL -> CSV
     temp_file_name = 'willshire.csv'
     # 20 years ago
-    start_date = (datetime.now().date())
-    end_date = ((datetime.now() - timedelta(days=20*365)).date())
+    end_date = (datetime.now().date())
+    start_date = ((datetime.now() - timedelta(days=20*365)).date())
     CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?mode=fred&recession_bars=on&ts=12&tts=12&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WILL5000PRFC&scale=left&cosd={}&coed={}&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily%2C%20Close&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-08&revision_date=2020-09-08&nd=1999-12-31%22'.format(str(start_date),str(end_date))
     data = {}
     response = requests.get(CSV_URL)
@@ -50,10 +50,10 @@ def download_gdp_monthly_rates():
     # SAVE URL -> CSV
     temp_file_name = 'gdp_quarterly.csv'
     # 20 years ago
-    start_date = (datetime.now().date())
-    end_date = ((datetime.now() - timedelta(days=20*365)).date())
-    CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=968&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=GDPC1&scale=left&cosd={}&coed={}&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-30&revision_date=2020-09-30&nd=1947-01-01
-'.format(str(start_date),str(end_date))
+    end_date = (datetime.now().date())
+    start_date = ((datetime.now() - timedelta(days=20*365)).date())
+    print(start_date,end_date)
+    CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=968&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=GDPC1&scale=left&cosd={}&coed={}&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2020-09-30&revision_date=2020-09-30&nd=1947-01-01'.format(str(start_date),str(end_date))
     data = {}
     response = requests.get(CSV_URL)
     with open(os.path.join("/usr/local/airflow/dags/files/", temp_file_name), 'wb') as f:
@@ -84,7 +84,7 @@ with DAG(dag_id = "willshire_dag",
         timeout=20
     )
     is_gdp_rates_available = HttpSensor(
-        task_id = "is_willshire_5000_available",
+        task_id = "is_gdp_rates_available",
         method = "GET",
         http_conn_id = "gdp_api",
         endpoint = 'latest',
@@ -100,7 +100,7 @@ with DAG(dag_id = "willshire_dag",
     download_gdp_monthly_rates = PythonOperator(
         task_id="download_gdp_monthly_rates",
         python_callable=download_gdp_monthly_rates
-        
+    )
     is_willshire_file_available = FileSensor(
         task_id="is_willshire_file_available",
         fs_conn_id="willshire_path",
@@ -188,27 +188,44 @@ with DAG(dag_id = "willshire_dag",
     populate_willshire_incremental = SparkSubmitOperator(
         task_id = "populate_willshire_incremental",
         conn_id = "spark_conn",
-        application = "/usr/local/airflow/dags/scripts/willshire_incremental_populate.py",
+        application = "/usr/local/airflow/dags/scripts/willshire_preprocessing/willshire_incremental_populate.py",
         verbose = False
     )
     
     populate_willshire_base = SparkSubmitOperator(
         task_id = "populate_willshire_base",
         conn_id = "spark_conn",
-        application = "/usr/local/airflow/dags/scripts/willshire_base_populate.py",
+        application = "/usr/local/airflow/dags/scripts/willshire_preprocessing/willshire_base_populate.py",
         verbose = False
     )
-
+    populate_gdp_incremental = SparkSubmitOperator(
+        task_id = "populate_gdp_incremental",
+        conn_id = "spark_conn",
+        application = "/usr/local/airflow/dags/scripts/gdp_preprocessing/gdp_incremental_populate.py",
+        verbose = False
+    )
+    populate_gdp_base = SparkSubmitOperator(
+        task_id = "populate_gdp_base",
+        conn_id = "spark_conn",
+        application = "/usr/local/airflow/dags/scripts/gdp_preprocessing/gdp_base_populate.py",
+        verbose = False
+    )
     # impute_willshire_zeros = SparkSubmitOperator(
     #     task_id = "impute_willshire_zeros",
     #     conn_id = "spark_conn",
-    #     application = "/usr/local/airflow/dags/scripts/impute_willshire_zeros.py",
+    #     application = "/usr/local/airflow/dags/scripts/willshire_preprocessing/impute_willshire_zeros.py",
     #     verbose = False
     # )
     delete_willshire_incremental_rows = SparkSubmitOperator(
         task_id = "delete_willshire_incremental_rows",
         conn_id = "spark_conn",
-        application = "/usr/local/airflow/dags/scripts/willshire_delete_incremental.py",
+        application = "/usr/local/airflow/dags/scripts/willshire_preprocessing/willshire_delete_incremental.py",
+        verbose = False
+    )
+    delete_gdp_incremental_rows = SparkSubmitOperator(
+        task_id = "delete_gdp_incremental_rows",
+        conn_id = "spark_conn",
+        application = "/usr/local/airflow/dags/scripts/gdp_preprocessing/gdp_delete_incremental.py",
         verbose = False
     )
     # sending_email = EmailOperator(
@@ -219,6 +236,15 @@ with DAG(dag_id = "willshire_dag",
     #         <h3>forex_data_pipeline succeeded</h3>
     #     """
     #     )
+
+    ### WILLSHIRE ONLY
     is_willshire_5000_available >> downloading_willshire_rates >> is_willshire_file_available >> saving_willshire_rates 
     saving_willshire_rates >> [creating_willshire_base_table, creating_willshire_incremental_table] >> populate_willshire_incremental 
     populate_willshire_incremental >> populate_willshire_base >> delete_willshire_incremental_rows
+    
+    ### GDP ONLY
+    is_gdp_rates_available >> download_gdp_monthly_rates >> is_gdp_file_available >> saving_gdp_rates 
+    saving_gdp_rates >> [creating_gdp_base_table, creating_gdp_incremental_table] >> populate_gdp_incremental
+    populate_gdp_incremental  >> populate_gdp_base >> delete_gdp_incremental_rows
+
+    #BOth

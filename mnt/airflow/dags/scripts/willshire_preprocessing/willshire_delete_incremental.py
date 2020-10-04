@@ -15,3 +15,4 @@ spark = SparkSession \
 
 # Delete all the rows from willshire_incremental_table and then recreate it so that you can store it in the next batch
 drop_table = spark.sql("DROP TABLE willshire_incremental_table")
+spark.stop()

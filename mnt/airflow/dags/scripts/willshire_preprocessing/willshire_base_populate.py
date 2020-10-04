@@ -33,3 +33,4 @@ willshire_rates = base_df.select('date', 'will5000') \
 # # Export the dataframe into the Hive table willshire_rates
 
 willshire_rates.write.mode("append").insertInto("willshire_base_table")
+spark.stop()

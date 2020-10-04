@@ -7,33 +7,32 @@ warehouse_location = abspath('spark-warehouse')
 # Initialize Spark Session
 spark = SparkSession \
     .builder \
-    .appName("Willshire processing") \
+    .appName("GDP processing") \
     .config("spark.sql.warehouse.dir", warehouse_location) \
     .enableHiveSupport() \
     .getOrCreate()
 
 # Read the file willshire.csv from the HDFS
-incr_df = spark.read.csv('hdfs://namenode:9000/willshire/willshire.csv', header = True)
-df = spark.sql("SELECT * FROM willshire_base_table")
-df.show()
-incr_df = incr_df.subtract(df)
+incr_df = spark.read.csv('hdfs://namenode:9000/gdp_quarterly/gdp_quarterly.csv', header = True)
+base_df = spark.sql("SELECT * FROM gdp_base_table")
+incr_df = incr_df.subtract(base_df)
 #incr_df = incr_df.union(base_df)
 incr_df.show()
 
 # Rename columns after union
-incr_df = incr_df.selectExpr("DATE as date", "WILL5000PRFC as will5000")
+incr_df = incr_df.selectExpr("DATE as date", "GDPC1 as quarterlyGDP")
 
 # # Drop the duplicated rows based on the base and last_update columns
-willshire_rates = incr_df.select('date', 'will5000') \
-    .dropDuplicates(['date', 'will5000']) \
-    .fillna(0,['will5000']) \
+gdp_rates = incr_df.select('date', 'quarterlyGDP') \
+    .dropDuplicates(['date', 'quarterlyGDP']) \
+    .fillna(0,['quarterlyGDP']) \
     .orderBy("date")
 
-willshire_rates.show()
+#gdp_rates.show()
 
 
 # Export the dataframe into the Hive table willshire_rates
 
-willshire_rates.write.mode("append").insertInto("willshire_incremental_table")
+gdp_rates.write.mode("append").insertInto("gdp_incremental_table")
 
 spark.stop()
