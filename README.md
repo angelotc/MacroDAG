@@ -21,3 +21,4 @@ The purpose of this ETL pipeline is to pull Willshire 5000 and interest rates on
 2. Use linear interpolation, knn interpolation, and spline interpolation for the 3 indicators. 
 3. Calculate Buffett Indicator using (WILLSHIRE5000/Daily interpolated GDP)
 4. GDP estimation using fbprophet
+5. Deploy on AWS.
