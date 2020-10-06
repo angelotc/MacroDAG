@@ -12,12 +12,11 @@
 
 
 # Illustration of DAG
-The purpose of this ETL pipeline is to pull Willshire 5000 rates on a nightly basis. The Willshire 5000 Index is an indicator of Stock Market Capitalization (SMC). 
+The purpose of this ETL pipeline is to pull Willshire 5000 and interest rates on a nightly basis, and GDP rates on a quarterly basis. From there, I am able to the quarterly Buffett Indicator. Each rate will be pulled in such a fashion: 
 
 ![Test Image 6](https://github.com/angelotc/airflow-docker-hdfs-spark-example/blob/master/dag-example.png)
 
 # To-do list (in order of priority)
 1. Create DAG for interest rates
-2. Add Pandas UDF of interpolate to fill 0 values
-3. Create DAG for GDP
-4. GDP estimation using fbprophet
+2. Use linear interpolation, knn interpolation, and spline interpolation for the 3 indicators. 
+3. GDP estimation using fbprophet
