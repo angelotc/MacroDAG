@@ -19,4 +19,5 @@ The purpose of this ETL pipeline is to pull Willshire 5000 and interest rates on
 # To-do list (in order of priority)
 1. Create DAG for interest rates
 2. Use linear interpolation, knn interpolation, and spline interpolation for the 3 indicators. 
-3. GDP estimation using fbprophet
+3. Calculate Buffett Indicator using (WILLSHIRE5000/Daily interpolated GDP)
+4. GDP estimation using fbprophet
