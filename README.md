@@ -12,13 +12,19 @@
 
 
 # Illustration of Macro DAG
-The purpose of this ETL pipeline is to pull Willshire 5000 and interest rates on a nightly basis, and GDP rates on a quarterly basis. From there, I am able to the quarterly Buffett Indicator. Each rate will be pulled in such a fashion: 
+The purpose of this ETL pipeline is to pull the following macroeconomic indicators:
+- Willshire 5000 on a nightly basis. 
+- interest rates on a nightly basis. 
+- GDP rates on a quarterly basis. The frequency will be interpolated into a daily frequency using a variety of methods (linear interpolation, knn, spline, ensemble methods).
+
+
+Each rate will be pulled in such a fashion: 
 
 ![Test Image 6](https://github.com/angelotc/airflow-docker-hdfs-spark-example/blob/master/dag-example.png)
 
 # To-do list (in order of priority)
 1. Create DAG for interest rates
-2. Use linear interpolation, knn interpolation, and spline interpolation for the 3 indicators. 
-3. Calculate Buffett Indicator using (WILLSHIRE5000/Daily interpolated GDP)
-4. GDP estimation using fbprophet
-5. Deploy on AWS.
+2. Deploy on AWS.
+4. Calculate Buffett Indicator using (WILLSHIRE5000/Daily interpolated GDP)
+5. Estimation using fbprophet
+
