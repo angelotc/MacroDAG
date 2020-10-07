@@ -11,7 +11,7 @@
 8. Run stop.sh ( type ```./stop.sh``` ). 
 
 
-# Illustration of DAG
+# Illustration of Macro DAG
 The purpose of this ETL pipeline is to pull Willshire 5000 and interest rates on a nightly basis, and GDP rates on a quarterly basis. From there, I am able to the quarterly Buffett Indicator. Each rate will be pulled in such a fashion: 
 
 ![Test Image 6](https://github.com/angelotc/airflow-docker-hdfs-spark-example/blob/master/dag-example.png)
