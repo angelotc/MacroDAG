@@ -2,7 +2,7 @@
 The purpose of this ETL pipeline is to pull the following macroeconomic indicators:
 - Willshire 5000 on a nightly basis. 
 - interest rates on a nightly basis. 
-- GDP rates on a quarterly basis. The frequency will be interpolated into a daily frequency using a variety of methods (linear interpolation, knn, spline, ensemble methods).
+- GDP rates on a quarterly basis. The frequency will be interpolated into a daily frequency (as opposed to weekdays) using a variety of methods (linear interpolation, knn, spline, ensemble methods).
 
 
 Each rate will be pulled in such a fashion: 
