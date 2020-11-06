@@ -18,6 +18,7 @@ Each rate will be pulled in such a fashion:
 
 # Requirements:
 - Docker
+- Docker compose
 
 # Instructions
 1. Run start.sh to execute the docker-compose (you can do this in command prompt by typing ```./start.sh```). 
